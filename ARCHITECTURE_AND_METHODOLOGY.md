@@ -3,7 +3,27 @@
 This technical document details the design specifications, mathematical foundations, and regulatory justifications supporting the **financial-abuse-fraud-monitoring-pipeline**. 
 
 ---
+## 🔄 Appendix: Architectural Evolution (Migration from REST to GraphQL API Platform)
 
+### 1. Modifications Implemented & Engineering Objectives
+*   **Deprecation of `yfinance` Wrapper:** Removed retail web-scraping wrappers from the codebase. In institutional data analytics, relying on unauthenticated libraries introduces runtime brittleness and lacks regulatory data ancestry controls.
+*   **Transition to GraphQL POST Payloads:** Implemented an enterprise-grade GraphQL schema parsing block within `src/data_ingestion.py`. The ingestion block uses explicit structural queries targeting standard Clearstream asset settlement data (`SettlementInstructions` data maps).
+*   **Token-Gated Security Architecture:** Implemented mandatory security headers (`X-DBP-APIKEY` configuration variables) mapping directly to the authentication requirements of the actual **Deutsche Börse Developer Portal Gateway**.
+*   **Downstream Pipeline Normalization:** Engineered data extraction dictionaries that safely transform unstructured graph responses into flat, typed columns (`Date`, `Volume`, `Close`) before they hit the SQL database staging lake (`raw_market_ledger`).
+
+### 2. Comparative Operational Analysis
+
+| Engineering Layer | Previous Architecture Block | Upgraded Production Framework |
+| :--- | :--- | :--- |
+| **Data Provider** | Yahoo Finance (Retail Endpoint) | **Deutsche Börse Group API Platform** |
+| **Query Protocol** | REST API GET Request | **GraphQL API POST Query Request** |
+| **Authentication** | Unauthenticated Public Access | **Secure Token Passing (`X-DBP-APIKEY`)** |
+| **Target Infrastructure**| General Index Volume Tracking | **Clearstream ISO 20022 Asset Settlement Matrix**|
+| **Data Payload** | Flat CSV Dataframe Columns | **Nested JSON Dictionary Hierarchy** |
+
+### 3. Purpose & Compliance Rationale for Migration
+1. **Navigating Regulatory Firewalls:** BaFin model guidelines state that data processing systems must demonstrate data provenance. Tracking individual keys and secure endpoint parameters ensures the data stream is authenticated.
+2. **Handling Complex Schemas:** True transaction monitoring at exchange levels requires isolating specific criteria (e.g., cross-border settlement amounts, matching states, and participant IDs). Standard REST returns massive data frames containing irrelevant variables. Using GraphQL queries allows the analyst to request only the exact fields required, reducing network overhead and improving performance.
 ## 📁 1. Functional Directory & File Specifications
 
 ### `config.py`
@@ -11,8 +31,8 @@ This technical document details the design specifications, mathematical foundati
 *   **Compliance Rationale:** Guarantees transparency and version-controlled change management. If BaFin or internal validation auditors require a change in variance limits, the alteration is modified here, creating a clear history log for the model audit trail.
 
 ### `src/data_ingestion.py`
-*   **Purpose:** Dynamically connects to an open API source (Yahoo Finance framework targeting the **DAX Index - `^GDAXI`**) to capture real-time market activity, and maps it directly into an in-memory SQL database structure (`raw_market_ledger`).
-*   **Compliance Rationale:** Implements the core database principles of continuous ingestion and automated input filtering, mapping out raw clearing infrastructure volumes before risk classification begins.
+*   **Purpose:** Connects via a token-gated HTTPS REST architecture to the **Deutsche Börse Group API Platform** (`developer.deutsche-boerse.com`), utilizing custom header authorizations to fetch transactional ledger fields.
+*   **Compliance Rationale:** Reflects real-world environment logic. It demonstrates proficiency in navigating enterprise authentication firewalls, managing status codes (such as handling `401 Unauthorized` or `429 Rate Limit` parameters), and parsing high-throughput nested JSON data arrays securely.*   
 
 ### `src/data_cleaning.py`
 *   **Purpose:** Executes database queries to clean formatting errors and automatically handles missing values using safe interpolation logic. It computes a 90-day moving historical mean (μ) and standard deviation (σ) per trading participant asset file.

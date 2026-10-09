@@ -1,13 +1,12 @@
 # Financial Fraud, AML/CFT & Transaction Monitoring Tuning Pipeline
 
-## 🚀 Project Overview
-This production-grade, modular pipeline structures a simulated compliance analytics platform optimized for global market exchange infrastructures (e.g., **Eurex**, **Clearstream**). 
+## 📝 Project Overview & Core Capabilities
+This repository houses a quantitative data engineering and statistical validation engine built to model institutional transaction risk, eliminate compliance alert fatigue, and automate risk detection protocols within high-volume financial exchange infrastructures.
 
-The repository demonstrates advanced data integration via open API frameworks, historical baseline engineering, and quantitative risk validation analytics (**Z-Score Anomaly Detection, Below-the-Line Kolmogorov-Smirnov Testing, and ROC/Youden's J Threshold Optimization**). All methodologies are architected to satisfy compliance requirements dictated by the **German Money Laundering Act (Geldwäschegesetz - GwG)**, **BaFin Model Validation Guidelines**, and the unified **EU Anti-Money Laundering Regulation (AMLR)**.
----
-### 🔍 Key Capabilities Deployed:
-*   **Live Market Data Ingestion:** Automates pipeline data collection from open API frameworks, staging raw financial trading and settlement markers into a centralized relational DB layer.
-*   **Advanced Feature Engineering:** Replicates complex SQL window functions using Python to generate rolling 90-day behavioral baselines ($\mu$, $\sigma$) per market participant, completely eliminating lookahead bias.
+### 🔍 Key Capabilities Deployed (Updated Build):
+*   **Enterprise GraphQL Ingestion Engine:** Replaced the legacy `yfinance` endpoint with an authenticated, token-gated HTTPS POST connection structure targeting the **Deutsche Börse Group API Platform** and **Eurex/Clearstream Developer Gateways**.
+*   **ISO 20022 Payloads Parsing:** Automates the handling of custom API keys (`X-DBP-APIKEY`), executes complex graph queries (`SettlementInstructions` schema), and flattens deeply nested JSON objects into normalized data matrix formats.
+*   **Advanced Feature Engineering:** Replicates complex SQL window functions using Python to generate rolling 90-day behavioral baselines (μ, σ) per market participant, completely eliminating lookahead bias.
 *   **BaFin-Compliant Scenario Tuning:** Employs a non-parametric **Two-Sample Kolmogorov-Smirnov (KS) Test** to perform empirical **Below-the-Line (BTL)** validation checks, mathematically proving to regulatory auditors that unalerted transaction tranches carry zero compliance leakage risk.
 *   **Classification Optimization:** Builds custom **ROC / AUC curves** and solves for the maximum **Youden’s J Statistic** to pinpoint the exact alert threshold that suppresses false-positive noise while keeping true risk capture locked at 100%.
 
